@@ -1,4 +1,4 @@
-// 플레이어 클래스
+// Player 클래스
 class Player {
     constructor(hp, top, left) {
         this.hp = hp;
@@ -38,6 +38,7 @@ class Zombie {
         this.speed = speed;
         this.directionX = -speed;
         this.directionY = -speed;
+        this.element = document.getElementById("zombie");
     }
 
     move() {
@@ -53,18 +54,21 @@ class Zombie {
     }
 
     updatePosition() {
-        const zombieElement = document.getElementById("zombie");
-        zombieElement.style.top = this.top + "px";
-        zombieElement.style.left = this.left + "px";
+        this.element.style.top = this.top + "px";
+        this.element.style.left = this.left + "px";
     }
 
     takeDamage(damage) {
         this.hp -= damage;
         if (this.hp <= 0) {
-            alert("맞췄다!");
+            this.remove();
             return true;
         }
         return false;
+    }
+
+    remove() {
+        this.element.style.display = "none"; // 좀비를 화면에서 제거
     }
 }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zombie World - Story 1: The Outbreak</title>
+    <title>Zombie World - Story 1: 과장님 오늘 집에 못가요</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -45,6 +45,8 @@
                 player.moveUp();
             } else if (event.code === "ArrowDown") {
                 player.moveDown();
+                            } else if (event.code === "ArrowLeft") {
+                player.moveLeft();
             } else if (event.code === "Space") {
                 player.shoot(bullet);
             }

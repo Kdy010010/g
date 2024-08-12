@@ -1,55 +1,61 @@
-// Player 클래스
+// 플레이어 클래스
 class Player {
-    constructor(hp, position) {
+    constructor(hp, top, left) {
         this.hp = hp;
-        this.position = position;
+        this.top = top;
+        this.left = left;
         this.attackPower = 20;
-    }
-
-    moveLeft() {
-        if (this.position > 10) {
-            this.position -= 10;
-            this.updatePosition();
-        }
-    }
-
-    moveRight() {
-        if (this.position < 740) {
-            this.position += 10;
-            this.updatePosition();
-        }
+        this.angle = 0;
     }
 
     updatePosition() {
-        document.getElementById("player").style.left = this.position + "px";
+        const playerElement = document.getElementById("player");
+        playerElement.style.top = this.top + "px";
+        playerElement.style.left = this.left + "px";
+        playerElement.style.transform = `rotate(${this.angle}deg)`;
+    }
+
+    aim(mouseX, mouseY) {
+        const deltaX = mouseX - (this.left + 10); // 플레이어의 중심을 기준으로 계산
+        const deltaY = mouseY - (this.top + 10);
+        this.angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+        this.updatePosition();
     }
 
     shoot(bullet) {
         if (!bullet.active) {
-            bullet.fire(this.position);
+            bullet.fire(this.left, this.top, this.angle);
         }
     }
 }
 
 // Zombie 클래스
 class Zombie {
-    constructor(hp, position, speed) {
+    constructor(hp, top, left, speed) {
         this.hp = hp;
-        this.position = position;
+        this.top = top;
+        this.left = left;
         this.speed = speed;
-        this.direction = -speed;
+        this.directionX = -speed;
+        this.directionY = -speed;
     }
 
     move() {
-        if (this.position <= 10 || this.position >= 740) {
-            this.direction *= -1;
+        if (this.left <= 10 || this.left >= 770) {
+            this.directionX *= -1;
         }
-        this.position += this.direction;
+        if (this.top <= 10 || this.top >= 370) {
+            this.directionY *= -1;
+        }
+        this.left += this.directionX;
+        this.top += this.directionY;
         this.updatePosition();
     }
 
     updatePosition() {
-        document.getElementById("zombie").style.right = (800 - this.position - 50) + "px";
+        const zombieElement = document.getElementById("zombie");
+        zombieElement.style.top = this.top + "px";
+        zombieElement.style.left = this.left + "px";
     }
 
     takeDamage(damage) {
@@ -65,112 +71,83 @@ class Zombie {
 // Bullet 클래스
 class Bullet {
     constructor() {
-        this.position = 60;
-        this.speed = 7;
+        this.top = 0;
+        this.left = 0;
+        this.speed = 10;
         this.active = false;
+        this.angle = 0;
     }
 
-    fire(playerPosition) {
-        this.position = playerPosition + 50;
+    fire(playerLeft, playerTop, angle) {
+        this.left = playerLeft + 10;
+        this.top = playerTop + 10;
+        this.angle = angle;
         this.active = true;
         document.getElementById("bullet").style.display = "block";
         this.updatePosition();
     }
 
-    move(zombie, playerAttackPower) {
+    move(zombie) {
         if (this.active) {
-            this.position += this.speed;
+            this.left += this.speed * Math.cos(this.angle * Math.PI / 180);
+            this.top += this.speed * Math.sin(this.angle * Math.PI / 180);
             this.updatePosition();
 
-            if (this.position >= zombie.position - 50 && this.position <= zombie.position) {
+            if (this.left >= zombie.left && this.left <= zombie.left + 20 &&
+                this.top >= zombie.top && this.top <= zombie.top + 20) {
                 this.active = false;
                 document.getElementById("bullet").style.display = "none";
-                this.position = 60;
-                return zombie.takeDamage(playerAttackPower);
+                return zombie.takeDamage(20);
             }
 
-            if (this.position >= 800) {
+            if (this.left >= 800 || this.left <= 0 || this.top >= 400 || this.top <= 0) {
                 this.active = false;
                 document.getElementById("bullet").style.display = "none";
-                this.position = 60;
             }
         }
         return false;
     }
 
     updatePosition() {
-        document.getElementById("bullet").style.left = this.position + "px";
-    }
-}
-
-// NPC 클래스
-class NPC {
-    constructor(hp, position) {
-        this.hp = hp;
-        this.position = position;
-        this.isZombie = false;
-        this.updatePosition();
-    }
-
-    move() {
-        if (this.isZombie) {
-            this.position += 1; // 좀비로 변하면 천천히 이동
-            this.updatePosition();
-        }
-    }
-
-    takeDamage(damage) {
-        this.hp -= damage;
-        if (this.hp <= 0 && !this.isZombie) {
-            this.turnIntoZombie();
-        }
-    }
-
-    turnIntoZombie() {
-        this.isZombie = true;
-        const npcElement = document.querySelector('.npc');
-        npcElement.classList.add('zombie');
-    }
-
-    updatePosition() {
-        document.querySelector('.npc').style.left = this.position + "px";
+        const bulletElement = document.getElementById("bullet");
+        bulletElement.style.left = this.left + "px";
+        bulletElement.style.top = this.top + "px";
     }
 }
 
 // Fighting NPC 클래스
 class FightingNPC {
-    constructor(hp, position) {
+    constructor(hp, top, left) {
         this.hp = hp;
-        this.position = position;
+        this.top = top;
+        this.left = left;
         this.attackPower = 20;
         this.isZombie = false;
+        this.angle = 0;
         this.bullet = new Bullet();
         this.updatePosition();
     }
 
-    moveLeft() {
-        if (this.position > 10) {
-            this.position -= 10;
-            this.updatePosition();
-        }
-    }
-
-    moveRight() {
-        if (this.position < 740) {
-            this.position += 10;
-            this.updatePosition();
-        }
-    }
-
     updatePosition() {
-        document.querySelector('.fighting-npc').style.left = this.position + "px";
+        const npcElement = document.querySelector('.fighting-npc');
+        npcElement.style.top = this.top + "px";
+        npcElement.style.left = this.left + "px";
+        npcElement.style.transform = `rotate(${this.angle}deg)`;
+    }
+
+    aimAt(zombie) {
+        const deltaX = zombie.left - this.left;
+        const deltaY = zombie.top - this.top;
+        this.angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+        this.updatePosition();
     }
 
     shoot(zombie) {
         if (!this.isZombie && !this.bullet.active) {
-            this.bullet.fire(this.position);
+            this.aimAt(zombie);
+            this.bullet.fire(this.left, this.top, this.angle);
         }
-        this.bullet.move(zombie, this.attackPower);
+        this.bullet.move(zombie);
     }
 
     takeDamage(damage) {
@@ -182,15 +159,15 @@ class FightingNPC {
 
     turnIntoZombie() {
         this.isZombie = true;
-        const fightingNpcElement = document.querySelector('.fighting-npc');
-        fightingNpcElement.classList.add('zombie');
+        const npcElement = document.querySelector('.fighting-npc');
+        npcElement.classList.add('zombie');
     }
 }
 
 // 게임 루프 함수
 function gameLoop(player, zombie, bullet, npc, fightingNpc) {
     zombie.move();
-    if (bullet.move(zombie, player.attackPower)) {
+    if (bullet.move(zombie)) {
         return true;
     }
     npc.move();

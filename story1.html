@@ -124,6 +124,7 @@
 }
 
     </style>
+
 </head>
 <body>
     <h1>Story 1: The Outbreak</h1>
@@ -148,9 +149,7 @@
         const bullet = new Bullet();
         const npc = new NPC(50, 200); // 일반 NPC
         const fightingNpc = new FightingNPC(100, 300); // 전투 NPC
-        const fightingNpc = new FightingNPC(100, 302); // 전투 NPC
-              const fightingNpc = new FightingNPC(100, 200); // 전투 NPC
-              const fightingNpc = new FightingNPC(100, 100); // 전투 NPC
+
         // 키보드 이벤트 설정
         document.addEventListener("keydown", function(event) {
             if (event.code === "ArrowLeft") {
@@ -165,5 +164,8 @@
         // 게임 루프 시작
         gameLoop(player, zombie, bullet, npc, fightingNpc);
     </script>
+</body>
+</html>
+
 </body>
 </html>

@@ -61,7 +61,7 @@ class Zombie {
     takeDamage(damage) {
         this.hp -= damage;
         if (this.hp <= 0) {
-            alert("You defeated the zombie!");
+            alert("맞췄다!");
             return true;
         }
         return false;

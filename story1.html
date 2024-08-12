@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zombie World - Story 1: 과장님 오늘 집에 못가요</title>
+    <title>Zombie World - Story 1: The Outbreak</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -24,11 +24,16 @@
     <script src="gameEngine.js"></script>
     <script>
         // 레벨 1 설정
-        const player = new Player(100, 10);
-        const zombie = new Zombie(50, 740, 2);
+        const player = new Player(100, 180, 10);
+        const zombie = new Zombie(50, 180, 740, 2);
         const bullet = new Bullet();
         const npc = new NPC(50, 200); // 일반 NPC
-        const fightingNpc = new FightingNPC(100, 300); // 전투 NPC
+        const fightingNpc = new FightingNPC(100, 180, 300); // 전투 NPC
+
+        document.addEventListener("mousemove", function(event) {
+            const rect = document.getElementById("game-area").getBoundingClientRect();
+            player.aim(event.clientX - rect.left, event.clientY - rect.top);
+        });
 
         // 키보드 이벤트 설정
         document.addEventListener("keydown", function(event) {
@@ -36,6 +41,10 @@
                 player.moveLeft();
             } else if (event.code === "ArrowRight") {
                 player.moveRight();
+            } else if (event.code === "ArrowUp") {
+                player.moveUp();
+            } else if (event.code === "ArrowDown") {
+                player.moveDown();
             } else if (event.code === "Space") {
                 player.shoot(bullet);
             }
@@ -46,4 +55,3 @@
     </script>
 </body>
 </html>
-
